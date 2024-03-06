@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class CharacterMovement : MonoBehaviour
 {
@@ -12,15 +13,9 @@ public class CharacterMovement : MonoBehaviour
     public SpriteRenderer spriteRenderer;
 
     private int movementRotation;
-    private bool isGrounded;
+    private bool isGrounded,isJumpSoundPlaying,isRunSoundPlaying;
 
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.tag=="Obstacle")
-        {
-            Destroy(gameObject);
-        }
-    }
+
     void Update()
     {
         RaycastHit2D hit = Physics2D.Raycast(transform.position + rayPosition, Vector2.down, rayLenght);
@@ -29,11 +24,13 @@ public class CharacterMovement : MonoBehaviour
         {
             isGrounded = true;
             characterAnimationController.StopJumpAnim();
+            isJumpSoundPlaying = false;
         }
         else
         {
             isGrounded = false;
             characterAnimationController.PlayJumpAnim();
+           
         }
         if (movementRotation==0)
         {
@@ -58,19 +55,19 @@ public class CharacterMovement : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            movementRotation = -1;
+            SetMovementRotation(-1);
         }
         if (Input.GetKeyUp(KeyCode.A))
         {
-            movementRotation = 0;
+            SetMovementRotation(0);
         }
         if (Input.GetKeyDown(KeyCode.D))
         {
-            movementRotation = 1;
+            SetMovementRotation(1);
         }
         if (Input.GetKeyUp(KeyCode.D))
         {
-            movementRotation = 0;
+            SetMovementRotation(0);
         }
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -81,12 +78,24 @@ public class CharacterMovement : MonoBehaviour
     public void SetMovementRotation(int movementrotation)
     {
         movementRotation = movementrotation;
+        if (movementRotation!=0 && isGrounded)
+        {
+            AudioManager.Instance.PlayRunSound();
+        }
+        else
+        {
+            AudioManager.Instance.StopRunSound();
+        }
     }
     public void JumpChar()
     {
         if (isGrounded)
         {
-            GetComponent<Rigidbody2D>().AddForce(Vector2.up * jumpPower);
+            GetComponent<Rigidbody2D>().AddForce(Vector2.up * jumpPower); 
+            
+                AudioManager.Instance.PlayJumpSound();
+                isJumpSoundPlaying = true;
+            
         }
     }
 }
