@@ -14,12 +14,18 @@ public class CharacterMovement : MonoBehaviour
 
     private int movementRotation;
     private bool isGrounded,isJumpSoundPlaying,isRunSoundPlaying;
+    private void Start()
+    {
+        transform.position = new Vector2(PlayerPrefs.GetFloat("CharXPos"),PlayerPrefs.GetFloat("CharYPos"));
+    }
 
 
     void Update()
     {
         RaycastHit2D hit = Physics2D.Raycast(transform.position + rayPosition, Vector2.down, rayLenght);
         Debug.DrawRay(transform.position + rayPosition, Vector3.down * rayLenght, Color.red);
+        PlayerPrefs.SetFloat("CharXPos",transform.position.x);
+        PlayerPrefs.SetFloat("CharYPos",transform.position.y);
         if (hit.collider != null && hit.collider.gameObject.tag == "Ground")
         {
             isGrounded = true;
